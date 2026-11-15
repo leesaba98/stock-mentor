@@ -1,0 +1,16 @@
+{
+  "name": "AI 주식 멘토",
+  "short_name": "주식멘토",
+  "description": "매일 아침 업데이트되는 이상봉 님 전용 AI 주식 브리핑 · 종목 진단 · 차트 · 추천 성과 트래커",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1630",
+  "theme_color": "#0e1630",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

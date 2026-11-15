@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e1630">
+<title>AI 주식 멘토</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#0e1630; --bg2:#141f42; --card:#1a2750; --card2:#20305f;
+  --line:rgba(255,255,255,.09); --txt:#f2f5ff; --sub:#aab4d4;
+  --up:#3fbf75; --down:#e05555; --amber:#f5b642; --blue:#4cc9f0;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:linear-gradient(180deg,#0e1630 0%,#101a3a 100%);
+  color:var(--txt); font-family:'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+  font-size:17px; line-height:1.55; padding-bottom:86px;
+}
+b{font-weight:700}
+.app-header{padding:18px 16px 8px; display:flex; align-items:center; gap:12px}
+.app-header img{width:44px;height:44px;border-radius:12px}
+.app-header h1{font-size:21px;margin:0}
+.app-header small{display:block;color:var(--sub);font-size:12.5px;font-weight:400}
+.tab{display:none; padding:10px 14px 20px}
+.tab.on{display:block}
+h2.sec{font-size:18px;margin:22px 2px 10px; display:flex; align-items:center; gap:8px}
+h2.sec::before{content:"";width:5px;height:18px;background:var(--blue);border-radius:3px;display:inline-block}
+
+/* 신호등 배너 */
+.signal{border-radius:18px;padding:18px 16px;margin-top:6px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.signal.hold{background:linear-gradient(135deg,#8a6d1d,#b98a1f); }
+.signal.buy{background:linear-gradient(135deg,#1e7a45,#2ca05c)}
+.signal.rest{background:linear-gradient(135deg,#5b6478,#78829a)}
+.signal.selective{background:linear-gradient(135deg,#1d5e8a,#2a7fb8)}
+.signal.caution{background:linear-gradient(135deg,#8a2f2f,#b8452f)}
+.sig-top{display:flex;align-items:center;gap:8px;font-size:13.5px;opacity:.92}
+.sig-ico{font-size:20px}
+.sig-name{font-size:27px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+.sig-name small{font-size:15px;font-weight:600;opacity:.85}
+.sig-sub{font-size:15px;font-weight:600;margin-bottom:10px}
+.sig-reasons{margin:0;padding-left:20px;font-size:14.5px}
+.sig-reasons li{margin:5px 0}
+.sig-note{margin-top:12px;background:rgba(0,0,0,.22);border-radius:10px;padding:9px 12px;font-size:14px}
+
+/* 지수 카드 */
+.idx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.idx-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.idx-name{font-size:13.5px;color:var(--sub);display:flex;justify-content:space-between}
+.idx-date{opacity:.7}
+.idx-val{font-size:23px;font-weight:800;margin:3px 0 1px;letter-spacing:-.4px}
+.idx-val small{font-size:13px;font-weight:500;color:var(--sub);margin-left:2px}
+.idx-chg{font-size:14.5px;font-weight:700}
+.idx-note{font-size:12.5px;color:var(--sub);margin-top:4px}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--sub)}
+
+/* 거시 요약 */
+.macro-item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;margin-bottom:10px}
+.macro-item .tag{display:inline-block;background:var(--card2);color:var(--blue);font-size:12.5px;font-weight:700;border-radius:8px;padding:2px 9px;margin-bottom:5px}
+.macro-item b{display:block;font-size:16.5px;margin-bottom:4px}
+.macro-item p{margin:0;font-size:14.5px;color:#d7ddf2}
+ul.check{list-style:none;padding:0;margin:0}
+ul.check li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:8px;font-size:14.5px}
+ul.check li.warn{border-color:rgba(245,182,66,.35)}
+ul.check li.src{font-size:12px;color:var(--sub);background:transparent;border-style:dashed}
+
+/* 종목 카드 */
+.stock-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:18px}
+.sc-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.stock-card h3{margin:0;font-size:20px;letter-spacing:-.4px}
+.stock-card h3 small{display:block;font-size:12.5px;color:var(--sub);font-weight:400}
+.sc-price{font-size:24px;font-weight:800;margin-top:5px}
+.sc-price span{font-size:15px;font-weight:700;margin-left:4px}
+.sc-date{font-size:12px;color:var(--sub);margin-top:2px}
+.sc-opinion{text-align:center;flex-shrink:0}
+.badge5{display:block;font-size:17px;font-weight:800;border-radius:12px;padding:9px 13px}
+.b-green{background:rgba(63,191,117,.18);color:var(--up);border:1.5px solid rgba(63,191,117,.5)}
+.b-red{background:rgba(224,85,85,.16);color:var(--down);border:1.5px solid rgba(224,85,85,.5)}
+.b-amber{background:rgba(245,182,66,.15);color:var(--amber);border:1.5px solid rgba(245,182,66,.5)}
+.sc-opinion small{display:block;font-size:11.5px;color:var(--sub);margin-top:4px}
+.sc-tagline{font-size:14.5px;background:var(--card2);border-radius:12px;padding:10px 12px;margin:12px 0}
+.sc-facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.sc-facts span{font-size:12.5px;background:rgba(255,255,255,.06);border-radius:9px;padding:4px 9px;color:#cdd5ee}
+.sc-block{margin-top:13px}
+.sc-block h4{margin:0 0 6px;font-size:15.5px;color:#dbe3ff}
+.sc-block p,.sc-block ol,.sc-block li{font-size:14.5px;color:#d7ddf2}
+.sc-block p{margin:0}
+.sc-block ol{margin:0;padding-left:20px}
+.sc-block li{margin:5px 0}
+.levels table{width:100%;border-collapse:collapse;font-size:14px}
+.levels th{text-align:left;color:var(--sub);font-weight:600;padding:6px 8px 6px 0;width:78px;vertical-align:top;white-space:nowrap}
+.levels td{padding:6px 0}
+.levels tr.stop th,.levels tr.stop td{color:#ffb1b1;background:rgba(224,85,85,.08);border-radius:8px}
+details.sc-news{margin-top:14px;background:var(--card2);border-radius:14px;padding:12px 14px}
+details.sc-news summary{cursor:pointer;font-weight:700;font-size:15px}
+.news-item{margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.n-head{font-size:12.5px;color:var(--sub)}
+.news-item a{color:#9fd8ff;font-size:15px;font-weight:700;text-decoration:none;line-height:1.4;display:block;margin:3px 0}
+.news-item p{margin:2px 0 0;font-size:13.5px;color:#c3cbe8}
+.rep-h{margin:14px 0 6px;font-size:14.5px;color:#dbe3ff}
+.rep-list{margin:0;padding-left:18px;font-size:13.5px;color:#c3cbe8}
+.rep-list li{margin:4px 0}
+
+/* 차트 탭 */
+.sel-row{display:flex;gap:8px;margin-bottom:10px}
+select{flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+.tf-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+button.tf, .opt-btn{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:11px;padding:9px 14px;font-size:14.5px;font-weight:700;font-family:inherit}
+button.tf.on, .opt-btn.on{background:var(--blue);color:#062033;border-color:var(--blue)}
+button.tf:disabled{opacity:.35}
+.chart-wrap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 6px 4px}
+#chart-title{font-size:15px;font-weight:700;padding:4px 10px 8px}
+#chart-canvas{width:100%;height:300px;display:block}
+.ind-list{margin-top:14px}
+.ind-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.ind-badge{font-size:20px;line-height:1.2}
+.ind-item b{font-size:14.5px}
+.ind-item p{margin:2px 0 0;font-size:13.5px;color:#c3cbe8;flex:1}
+
+/* 추천 탭 */
+.rec-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:11px}
+.rec-card h3{margin:0 0 6px;font-size:18px}
+.rec-card h3 small{display:block;font-size:12.5px;color:var(--sub);font-weight:400}
+.rec-why{margin:0;font-size:14.5px;color:#d7ddf2}
+.rec-fun{margin:7px 0 0;font-size:13px;color:#9fd8ff}
+.rec-risk{margin:6px 0 0;font-size:13px;color:#ffcf9e}
+.rec-note{font-size:12.5px;color:var(--sub);margin:10px 2px}
+table.tracker{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
+table.tracker th{background:var(--card2);color:var(--sub);font-size:12.5px;font-weight:600;padding:9px 6px;text-align:center}
+table.tracker td{padding:10px 6px;text-align:center;border-top:1px solid var(--line);font-weight:600}
+table.tracker td:first-child{text-align:left;padding-left:12px}
+table.tracker .total td{text-align:center;color:var(--amber);font-weight:800;background:rgba(245,182,66,.06)}
+
+/* Q&A */
+.qa-form{display:flex;gap:8px;margin-bottom:8px}
+.qa-form input{flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:16px;font-family:inherit}
+.qa-form button{background:var(--blue);color:#062033;border:0;border-radius:14px;padding:0 20px;font-size:16px;font-weight:800;font-family:inherit}
+.qa-notice,.qa-disclaimer{font-size:13px;color:var(--sub);margin:6px 2px}
+.qa-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.qa-q{display:flex;align-items:flex-start;gap:8px}
+.qa-q b{flex:1;font-size:15px;line-height:1.4}
+.qa-del{background:transparent;border:0;font-size:16px;cursor:pointer;padding:0 2px}
+.qa-a{margin-top:8px;font-size:14.5px;color:#d7ddf2;background:var(--card2);border-radius:10px;padding:10px 12px}
+.qa-date{font-size:11.5px;color:var(--sub);margin-top:5px;text-align:right}
+.qa-empty{color:var(--sub);font-size:14.5px;text-align:center;padding:26px 0}
+
+/* 하단 탭바 */
+.tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(14,22,48,.97);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:50}
+.tabbar button{flex:1;background:transparent;border:0;color:var(--sub);font-size:11.5px;font-weight:600;font-family:inherit;padding:6px 0 4px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button .ic{font-size:20px}
+.tabbar button.on{color:#fff}
+.tabbar button.on .ic{transform:translateY(-1px)}
+.build{font-size:11.5px;color:var(--sub);text-align:center;padding:14px 10px 0}
+@media (min-width:560px){ .idx-grid{grid-template-columns:repeat(3,1fr)} body{font-size:18px} }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <img src="icons/icon-192.png" alt="AI 주식 멘토">
+  <h1>📈 AI 주식 멘토<small id="hdr-sub"></small></h1>
+</header>
+
+<!-- 1) 오늘 브리핑 -->
+<section id="tab-briefing" class="tab on">
+  <div id="signal-banner"></div>
+  <h2 class="sec">참고 지수 — 국장 & 미장</h2>
+  <div id="idx-cards" class="idx-grid"></div>
+  <h2 class="sec">거시경제 · 투자 심리</h2>
+  <div id="macro-summary"></div>
+  <h2 class="sec">바닥 · 리스크 체크</h2>
+  <ul id="bottom-check" class="check"></ul>
+</section>
+
+<!-- 2) 내 종목 진단 -->
+<section id="tab-stocks" class="tab">
+  <h2 class="sec">보유 종목 정밀 진단</h2>
+  <div id="stock-cards"></div>
+</section>
+
+<!-- 3) 차트·지표 -->
+<section id="tab-chart" class="tab">
+  <div class="sel-row">
+    <select id="sel-stock" aria-label="종목 선택"></select>
+  </div>
+  <div id="tf-buttons" class="tf-row"></div>
+  <div class="tf-row">
+    <button id="btn-ma" class="opt-btn">이동평균</button>
+    <button id="btn-bb" class="opt-btn">볼린저밴드</button>
+    <button id="btn-ichi" class="opt-btn">일목균형표</button>
+  </div>
+  <div class="chart-wrap">
+    <div id="chart-title">로딩 중…</div>
+    <canvas id="chart-canvas"></canvas>
+  </div>
+  <h2 class="sec">지표 해석 (🟢 긍정 / 🟡 중립 / 🔴 부정)</h2>
+  <div id="ind-list" class="ind-list"></div>
+</section>
+
+<!-- 4) 추천·수익률 -->
+<section id="tab-rec" class="tab">
+  <h2 class="sec">오늘의 추천 종목</h2>
+  <p class="rec-note" id="rec-note-head"></p>
+  <div id="rec-cards"></div>
+  <h2 class="sec">성과 트래커</h2>
+  <table class="tracker">
+    <thead><tr><th>종목</th><th>추천일</th><th>추천가</th><th>현재가</th><th>수익률</th></tr></thead>
+    <tbody id="rec-tbody"></tbody>
+  </table>
+  <p class="rec-note" id="rec-note"></p>
+</section>
+
+<!-- 5) Q&A -->
+<section id="tab-qa" class="tab">
+  <h2 class="sec">질문하기</h2>
+  <form id="qa-form" class="qa-form">
+    <input id="qa-input" type="text" placeholder="예: 손절선이 얼마야?" autocomplete="off" maxlength="200">
+    <button type="submit">등록</button>
+  </form>
+  <p class="qa-notice" id="qa-notice"></p>
+  <div id="qa-list"></div>
+  <p class="qa-disclaimer" id="qa-disclaimer"></p>
+</section>
+
+<nav class="tabbar">
+  <button data-tab="tab-briefing" class="on"><span class="ic">🚦</span>오늘 브리핑</button>
+  <button data-tab="tab-stocks"><span class="ic">🔍</span>내 종목 진단</button>
+  <button data-tab="tab-chart"><span class="ic">📊</span>차트·지표</button>
+  <button data-tab="tab-rec"><span class="ic">⭐</span>추천·수익률</button>
+  <button data-tab="tab-qa"><span class="ic">💬</span>Q&amp;A</button>
+</nav>
+
+<div class="build" id="build-date"></div>
+
+<script src="indicators.js"></script>
+<script src="chart.js"></script>
+<script src="data_kr.js"></script>
+<script src="data_us.js"></script>
+<script src="app-data.js"></script>
+<script src="app.js"></script>
+<script>
+document.getElementById("hdr-sub").textContent = document.title.includes("멘토") ? "상봉 님 전용 · 매일 아침 업데이트" : "";
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
