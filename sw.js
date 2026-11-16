@@ -3,13 +3,13 @@
  *       실패 시에만 캐시로 화면을 유지). 설치 후 재방문 시 새 파일이
  *       바로 반영되도록 오래된 캐시는 매번 정리합니다.
  */
-const CACHE = 'stock-mentor-v3';
+const CACHE = 'stock-mentor-v4';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
