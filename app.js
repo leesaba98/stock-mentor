@@ -46,7 +46,7 @@
     $("#idx-cards").innerHTML = D.indices.map((i) =>
       '<div class="idx-card ' + clsPct(i.chgPct || 0) + '">' +
       '<div class="idx-name">' + i.name + ' <span class="idx-date">' + i.date + '</span></div>' +
-      '<div class="idx-val">' + won(+i.val.toFixed(2)) + '<small>' + i.unit + '</small></div>' +
+      '<div class="idx-val">' + (i.unit === "%" ? (+i.val).toFixed(2) : won(+i.val.toFixed(2))) + '<small>' + i.unit + '</small></div>' +
       '<div class="idx-chg">' + (i.chgText || (i.chgPct == null ? "" : pct(i.chgPct) + " (" + (i.chg > 0 ? "+" : i.chg < 0 ? "-" : "") + Math.abs(i.chg).toFixed(2) + (i.unit === "p" ? "p" : i.unit) + ")")) + '</div>' +
       (i.note ? '<div class="idx-note">' + i.note + '</div>' : "") +
       '</div>'
