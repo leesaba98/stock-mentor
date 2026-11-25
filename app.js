@@ -5,7 +5,10 @@
   const D = window.APP_DATA;
   const KD = window.CHART_DATA_KR || {};
   const UD = window.CHART_DATA_US || {};
-  const ALL = Object.assign({}, KD, UD);
+  // 차트 선택값(US_IXIC·US_INX·US_SOX·US_VIX)으로도 미국 지수를 찾을 수 있게 별칭을 함께 넣습니다
+  const UD_ALIAS = {};
+  Object.keys(UD).forEach((k) => { UD_ALIAS["US_" + k] = UD[k]; });
+  const ALL = Object.assign({}, KD, UD, UD_ALIAS);
   const $ = (s, el) => (el || document).querySelector(s);
   const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
 
